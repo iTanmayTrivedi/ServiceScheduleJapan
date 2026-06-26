@@ -10,7 +10,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.1"
+    PostgrestVersion: "14.5"
   }
   public: {
     Tables: {
@@ -18,41 +18,41 @@ export type Database = {
         Row: {
           appointment_date: string
           created_at: string
+          customer_id: string
           end_time: string
           id: string
           notes: string | null
-          service_id: string
+          service_id: string | null
           staff_id: string | null
           start_time: string
           status: Database["public"]["Enums"]["appointment_status"]
           updated_at: string
-          user_id: string
         }
         Insert: {
           appointment_date: string
           created_at?: string
+          customer_id: string
           end_time: string
           id?: string
           notes?: string | null
-          service_id: string
+          service_id?: string | null
           staff_id?: string | null
           start_time: string
           status?: Database["public"]["Enums"]["appointment_status"]
           updated_at?: string
-          user_id: string
         }
         Update: {
           appointment_date?: string
           created_at?: string
+          customer_id?: string
           end_time?: string
           id?: string
           notes?: string | null
-          service_id?: string
+          service_id?: string | null
           staff_id?: string | null
           start_time?: string
           status?: Database["public"]["Enums"]["appointment_status"]
           updated_at?: string
-          user_id?: string
         }
         Relationships: [
           {
@@ -62,49 +62,45 @@ export type Database = {
             referencedRelation: "services"
             referencedColumns: ["id"]
           },
-          {
-            foreignKeyName: "appointments_staff_id_fkey"
-            columns: ["staff_id"]
-            isOneToOne: false
-            referencedRelation: "profiles"
-            referencedColumns: ["user_id"]
-          },
         ]
       }
       business_hours: {
         Row: {
+          close_time: string | null
           created_at: string
           day_of_week: number
-          end_time: string
           id: string
-          is_open: boolean
-          start_time: string
+          is_closed: boolean
+          open_time: string | null
+          updated_at: string
         }
         Insert: {
+          close_time?: string | null
           created_at?: string
           day_of_week: number
-          end_time?: string
           id?: string
-          is_open?: boolean
-          start_time?: string
+          is_closed?: boolean
+          open_time?: string | null
+          updated_at?: string
         }
         Update: {
+          close_time?: string | null
           created_at?: string
           day_of_week?: number
-          end_time?: string
           id?: string
-          is_open?: boolean
-          start_time?: string
+          is_closed?: boolean
+          open_time?: string | null
+          updated_at?: string
         }
         Relationships: []
       }
       profiles: {
         Row: {
           avatar_url: string | null
-          banner_url: string | null
+          bio: string | null
           created_at: string
-          email: string
-          full_name: string
+          email: string | null
+          full_name: string | null
           id: string
           phone: string | null
           updated_at: string
@@ -112,10 +108,10 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
-          banner_url?: string | null
+          bio?: string | null
           created_at?: string
-          email?: string
-          full_name?: string
+          email?: string | null
+          full_name?: string | null
           id?: string
           phone?: string | null
           updated_at?: string
@@ -123,10 +119,10 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
-          banner_url?: string | null
+          bio?: string | null
           created_at?: string
-          email?: string
-          full_name?: string
+          email?: string | null
+          full_name?: string | null
           id?: string
           phone?: string | null
           updated_at?: string
@@ -139,30 +135,39 @@ export type Database = {
           appointment_id: string
           comment: string | null
           created_at: string
+          customer_id: string
           id: string
           rating: number
-          user_id: string
         }
         Insert: {
           appointment_id: string
           comment?: string | null
           created_at?: string
+          customer_id: string
           id?: string
           rating: number
-          user_id: string
         }
         Update: {
           appointment_id?: string
           comment?: string | null
           created_at?: string
+          customer_id?: string
           id?: string
           rating?: number
-          user_id?: string
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "ratings_appointment_id_fkey"
+            columns: ["appointment_id"]
+            isOneToOne: true
+            referencedRelation: "appointments"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       services: {
         Row: {
+          category: string | null
           created_at: string
           description: string | null
           duration_minutes: number
@@ -173,6 +178,7 @@ export type Database = {
           updated_at: string
         }
         Insert: {
+          category?: string | null
           created_at?: string
           description?: string | null
           duration_minutes?: number
@@ -183,6 +189,7 @@ export type Database = {
           updated_at?: string
         }
         Update: {
+          category?: string | null
           created_at?: string
           description?: string | null
           duration_minutes?: number
@@ -203,15 +210,17 @@ export type Database = {
           is_available: boolean
           staff_id: string
           start_time: string
+          updated_at: string
         }
         Insert: {
           created_at?: string
           day_of_week: number
-          end_time?: string
+          end_time: string
           id?: string
           is_available?: boolean
           staff_id: string
-          start_time?: string
+          start_time: string
+          updated_at?: string
         }
         Update: {
           created_at?: string
@@ -221,6 +230,7 @@ export type Database = {
           is_available?: boolean
           staff_id?: string
           start_time?: string
+          updated_at?: string
         }
         Relationships: []
       }
@@ -250,11 +260,18 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      has_role: {
+        Args: {
+          _role: Database["public"]["Enums"]["app_role"]
+          _user_id: string
+        }
+        Returns: boolean
+      }
       is_admin: { Args: { _user_id: string }; Returns: boolean }
       is_staff: { Args: { _user_id: string }; Returns: boolean }
     }
     Enums: {
-      app_role: "customer" | "admin" | "staff"
+      app_role: "customer" | "staff" | "admin"
       appointment_status:
         | "pending"
         | "confirmed"
@@ -388,7 +405,7 @@ export type CompositeTypes<
 export const Constants = {
   public: {
     Enums: {
-      app_role: ["customer", "admin", "staff"],
+      app_role: ["customer", "staff", "admin"],
       appointment_status: [
         "pending",
         "confirmed",
