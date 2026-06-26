@@ -18,7 +18,6 @@ export type Database = {
         Row: {
           appointment_date: string
           created_at: string
-          customer_id: string
           end_time: string
           id: string
           notes: string | null
@@ -27,11 +26,11 @@ export type Database = {
           start_time: string
           status: Database["public"]["Enums"]["appointment_status"]
           updated_at: string
+          user_id: string
         }
         Insert: {
           appointment_date: string
           created_at?: string
-          customer_id: string
           end_time: string
           id?: string
           notes?: string | null
@@ -40,11 +39,11 @@ export type Database = {
           start_time: string
           status?: Database["public"]["Enums"]["appointment_status"]
           updated_at?: string
+          user_id: string
         }
         Update: {
           appointment_date?: string
           created_at?: string
-          customer_id?: string
           end_time?: string
           id?: string
           notes?: string | null
@@ -53,6 +52,7 @@ export type Database = {
           start_time?: string
           status?: Database["public"]["Enums"]["appointment_status"]
           updated_at?: string
+          user_id?: string
         }
         Relationships: [
           {
@@ -66,30 +66,30 @@ export type Database = {
       }
       business_hours: {
         Row: {
-          close_time: string | null
           created_at: string
           day_of_week: number
+          end_time: string | null
           id: string
-          is_closed: boolean
-          open_time: string | null
+          is_open: boolean
+          start_time: string | null
           updated_at: string
         }
         Insert: {
-          close_time?: string | null
           created_at?: string
           day_of_week: number
+          end_time?: string | null
           id?: string
-          is_closed?: boolean
-          open_time?: string | null
+          is_open?: boolean
+          start_time?: string | null
           updated_at?: string
         }
         Update: {
-          close_time?: string | null
           created_at?: string
           day_of_week?: number
+          end_time?: string | null
           id?: string
-          is_closed?: boolean
-          open_time?: string | null
+          is_open?: boolean
+          start_time?: string | null
           updated_at?: string
         }
         Relationships: []
@@ -97,6 +97,7 @@ export type Database = {
       profiles: {
         Row: {
           avatar_url: string | null
+          banner_url: string | null
           bio: string | null
           created_at: string
           email: string | null
@@ -108,6 +109,7 @@ export type Database = {
         }
         Insert: {
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           email?: string | null
@@ -119,6 +121,7 @@ export type Database = {
         }
         Update: {
           avatar_url?: string | null
+          banner_url?: string | null
           bio?: string | null
           created_at?: string
           email?: string | null
@@ -135,25 +138,25 @@ export type Database = {
           appointment_id: string
           comment: string | null
           created_at: string
-          customer_id: string
           id: string
           rating: number
+          user_id: string
         }
         Insert: {
           appointment_id: string
           comment?: string | null
           created_at?: string
-          customer_id: string
           id?: string
           rating: number
+          user_id: string
         }
         Update: {
           appointment_id?: string
           comment?: string | null
           created_at?: string
-          customer_id?: string
           id?: string
           rating?: number
+          user_id?: string
         }
         Relationships: [
           {
