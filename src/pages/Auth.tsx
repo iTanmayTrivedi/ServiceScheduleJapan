@@ -1,6 +1,5 @@
 import { useAuth, DEMO_USERS, type AuthMode } from '@/hooks/useAuth';
 import { supabase } from '@/integrations/supabase/client';
-import { lovable } from '@/integrations/lovable';
 import { Navigate } from 'react-router-dom';
 import { useState } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -176,9 +175,12 @@ export default function Auth() {
                 onClick={async () => {
                   setLoading(true);
                   try {
-                    const result = await lovable.auth.signInWithOAuth('google', { redirect_uri: window.location.origin });
-                    if (result.error) {
-                      toast({ title: t('auth.loginFailed'), description: (result.error as any)?.message || 'Google sign in failed', variant: 'destructive' });
+                    const { error } = await supabase.auth.signInWithOAuth({
+                      provider: 'google',
+                      options: { redirectTo: `${window.location.origin}/` },
+                    });
+                    if (error) {
+                      toast({ title: t('auth.loginFailed'), description: error.message || 'Google sign in failed', variant: 'destructive' });
                       setLoading(false);
                     }
                   } catch (err: any) {
