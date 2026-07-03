@@ -15,7 +15,7 @@ import AuthShowcase from '@/components/auth/AuthShowcase';
 const roleIcons = { admin: Shield, staff: UserCog, customer: User };
 
 export default function Auth() {
-  const { user, isAdmin, isStaff, loginAs, authMode, setAuthMode, signIn, signUp } = useAuth();
+  const { user, isAdmin, isStaff, loginAs, authMode, setAuthMode, signIn, signUp, isLoading: authLoading } = useAuth();
   const { t } = useTranslation();
   const { toast } = useToast();
   const [isLogin, setIsLogin] = useState(true);
@@ -30,7 +30,7 @@ export default function Auth() {
   const [forgotMode, setForgotMode] = useState(false);
   const [resetEmail, setResetEmail] = useState('');
 
-  if (user) return <Navigate to={isAdmin ? '/admin' : isStaff ? '/staff' : '/dashboard'} replace />;
+  if (user && !authLoading) return <Navigate to={isAdmin ? '/admin' : isStaff ? '/staff' : '/dashboard'} replace />;
 
   const passwordRules = [
     { label: 'At least 8 characters', valid: password.length >= 8 },
