@@ -6,7 +6,7 @@ import { useTranslation } from 'react-i18next';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { CalendarDays, Loader2, Shield, UserCog, User, Settings } from 'lucide-react';
+import { CalendarDays, Loader2, Shield, UserCog, User, Settings, Eye, EyeOff, Check, X } from 'lucide-react';
 import { LanguageSwitcher } from '@/components/LanguageSwitcher';
 import { useToast } from '@/hooks/use-toast';
 import { motion } from 'framer-motion';
@@ -21,6 +21,9 @@ export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [showConfirm, setShowConfirm] = useState(false);
   const [fullName, setFullName] = useState('');
   const [role, setRole] = useState<'customer' | 'admin' | 'staff'>('customer');
   const [loading, setLoading] = useState(false);
@@ -29,8 +32,27 @@ export default function Auth() {
 
   if (user) return <Navigate to={isAdmin ? '/admin' : isStaff ? '/staff' : '/dashboard'} replace />;
 
+  const passwordRules = [
+    { label: 'At least 8 characters', valid: password.length >= 8 },
+    { label: 'One uppercase letter', valid: /[A-Z]/.test(password) },
+    { label: 'One lowercase letter', valid: /[a-z]/.test(password) },
+    { label: 'One number', valid: /[0-9]/.test(password) },
+  ];
+  const passwordValid = passwordRules.every(r => r.valid);
+  const passwordsMatch = password.length > 0 && password === confirmPassword;
+
   const handleRealSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    if (!isLogin) {
+      if (!passwordValid) {
+        toast({ title: 'Weak password', description: 'Please meet all password requirements.', variant: 'destructive' });
+        return;
+      }
+      if (!passwordsMatch) {
+        toast({ title: 'Passwords do not match', description: 'Please confirm your password.', variant: 'destructive' });
+        return;
+      }
+    }
     setLoading(true);
     try {
       if (isLogin) {
@@ -155,8 +177,70 @@ export default function Auth() {
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="password" className="text-[hsl(210,20%,80%)] text-xs">{t('common.password')}</Label>
-                  <Input id="password" type="password" value={password} onChange={(e) => setPassword(e.target.value)} placeholder="••••••••" required minLength={6} className={inputClass} />
+                  <div className="relative">
+                    <Input
+                      id="password"
+                      type={showPassword ? 'text' : 'password'}
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      placeholder="••••••••"
+                      required
+                      minLength={6}
+                      className={`${inputClass} pr-10`}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => setShowPassword(v => !v)}
+                      className="absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(220,10%,45%)] hover:text-[hsl(175,70%,42%)] transition-colors"
+                      tabIndex={-1}
+                      aria-label={showPassword ? 'Hide password' : 'Show password'}
+                    >
+                      {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </button>
+                  </div>
                 </div>
+                {!isLogin && (
+                  <>
+                    {password.length > 0 && (
+                      <ul className="space-y-1 rounded-lg bg-[hsl(220,25%,9%)] border border-[hsl(220,20%,16%)] p-2.5">
+                        {passwordRules.map((r) => (
+                          <li key={r.label} className="flex items-center gap-2 text-[11px]">
+                            {r.valid
+                              ? <Check className="h-3 w-3 text-[hsl(175,70%,42%)]" />
+                              : <X className="h-3 w-3 text-[hsl(220,10%,40%)]" />}
+                            <span className={r.valid ? 'text-[hsl(210,20%,80%)]' : 'text-[hsl(220,10%,45%)]'}>{r.label}</span>
+                          </li>
+                        ))}
+                      </ul>
+                    )}
+                    <div className="space-y-1.5">
+                      <Label htmlFor="confirmPassword" className="text-[hsl(210,20%,80%)] text-xs">Confirm password</Label>
+                      <div className="relative">
+                        <Input
+                          id="confirmPassword"
+                          type={showConfirm ? 'text' : 'password'}
+                          value={confirmPassword}
+                          onChange={(e) => setConfirmPassword(e.target.value)}
+                          placeholder="••••••••"
+                          required
+                          className={`${inputClass} pr-10`}
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowConfirm(v => !v)}
+                          className="absolute right-3 top-1/2 -translate-y-1/2 text-[hsl(220,10%,45%)] hover:text-[hsl(175,70%,42%)] transition-colors"
+                          tabIndex={-1}
+                          aria-label={showConfirm ? 'Hide password' : 'Show password'}
+                        >
+                          {showConfirm ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                        </button>
+                      </div>
+                      {confirmPassword.length > 0 && !passwordsMatch && (
+                        <p className="text-[11px] text-[hsl(0,70%,60%)]">Passwords do not match</p>
+                      )}
+                    </div>
+                  </>
+                )}
                 <Button type="submit" className="w-full h-11 rounded-xl bg-[hsl(175,70%,42%)] text-white font-medium hover:bg-[hsl(175,70%,38%)] transition-colors" disabled={loading}>
                   {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
                   {isLogin ? t('common.signIn') : t('common.signUp')}
