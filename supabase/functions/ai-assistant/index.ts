@@ -223,7 +223,7 @@ Provide realistic predictions with peak hours and actionable suggestions.`,
       }
       const t = await response.text();
       console.error("Groq API error:", response.status, t);
-      return new Response(JSON.stringify({ error: "AI service error" }), {
+      return new Response(JSON.stringify({ error: "AI service error", status: response.status, details: t.slice(0, 500) }), {
         status: 500,
         headers: { ...corsHeaders, "Content-Type": "application/json" },
       });
