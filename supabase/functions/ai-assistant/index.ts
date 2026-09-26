@@ -186,7 +186,6 @@ Provide realistic predictions with peak hours and actionable suggestions.`,
     }
 
     const body: any = {
-      model: "llama-3.3-70b-versatile",
       messages: [
         { role: "system", content: systemPrompt },
         ...userMessages,
@@ -199,14 +198,29 @@ Provide realistic predictions with peak hours and actionable suggestions.`,
       body.tool_choice = toolChoice;
     }
 
-    const response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        Authorization: `Bearer ${GROQ_API_KEY}`,
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify(body),
-    });
+    // Try models in order; fall back if a model is unavailable for this key
+    const MODELS = [
+      "llama-3.3-70b-versatile",
+      "openai/gpt-oss-120b",
+      "meta-llama/llama-4-maverick-17b-128e-instruct",
+      "openai/gpt-oss-20b",
+      "llama-3.1-8b-instant",
+    ];
+    let response!: Response;
+    for (const model of MODELS) {
+      response = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${GROQ_API_KEY}`,
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ ...body, model }),
+      });
+      if (response.status !== 404 && response.status !== 400) break;
+      const errText = await response.clone().text();
+      if (!errText.includes("model")) break;
+      console.warn(`Groq model ${model} unavailable, trying next`);
+    }
 
     if (!response.ok) {
       if (response.status === 429) {
