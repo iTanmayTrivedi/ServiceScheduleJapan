@@ -1,0 +1,5 @@
+# Current tasks
+
+- [ ] Remove unused platform auth integration and editor-only tagging dependency.
+- [ ] Rename preview storage identifiers and comments while preserving its external protocol.
+- [ ] Verify references, preview login behavior, and unchanged page rendering.
