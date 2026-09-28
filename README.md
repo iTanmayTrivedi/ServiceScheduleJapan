@@ -13,7 +13,7 @@
 
 <br/>
 
-🌐 **[Live Demo](https://your-url.com)** · 🎬 **[Demo Video](https://youtube.com/your-video)** · 📖 **[Case Study (PDF)](https://tanmaytrivedi.dev/projects/bookflow)** · 💼 **[LinkedIn](https://linkedin.com/in/tanmaytrivedi)**
+🌐 **[Live Demo](https://bookflow.tanmaytrivedi.dev/)** · 📖 **[Case Study](https://tanmaytrivedi.dev/projects/bookflow)** · 💼 **[LinkedIn](https://linkedin.com/in/itanmaytrivedi)**
 
 <br/>
 
